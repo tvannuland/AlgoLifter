@@ -5,8 +5,39 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:prism="http://prismlibrary.com/"
         xmlns:local="clr-namespace:AlgoLifter"
-        Title="AlgoLifter Control" Height="1280" Width="800">
-    <Grid>
-        <ContentControl prism:RegionManager.RegionName="MainWindow" />
-    </Grid>
+        Title="AlgoLifter Control" Height="800" Width="1280">
+    <ContentControl prism:RegionManager.RegionName="MainWindow" >
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="120"/>
+                <ColumnDefinition Width="120"/>
+                <ColumnDefinition Width="120"/>
+                <ColumnDefinition Width="120"/>
+                <ColumnDefinition Width="120"/>
+                <ColumnDefinition Width="120"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="140"/>
+                <RowDefinition Height="140"/>
+                <RowDefinition Height="140"/>
+                <RowDefinition Height="140"/>
+                <RowDefinition Height="140"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <Border BorderBrush="Black" BorderThickness="1" HorizontalAlignment="Left" Height="400" Margin="10,10,10,10" VerticalAlignment="Top" Width="220" Grid.RowSpan="3" Grid.ColumnSpan="2">
+                <ListView x:Name="listView">
+                    <ListView.View>
+                        <GridView>
+                            <GridViewColumn Width="80" Header="ID"/>
+                            <GridViewColumn Width="140" Header="Status"/>
+                        </GridView>
+                    </ListView.View>
+                </ListView>
+            </Border>
+            <Button x:Name="btnConnect" Content="Connect" HorizontalAlignment="Left" Height="50" Margin="10,10,10,10" VerticalAlignment="Top" Width="100" Grid.Column="3" />
+            <Button x:Name="btnDisconnect" Content="Disconnect" HorizontalAlignment="Left" Height="50" Margin="10,10,10,10" VerticalAlignment="Bottom" Width="100" Grid.Column="3" />
+            <ComboBox x:Name="cmbPort" Grid.Column="2" HorizontalAlignment="Left" Margin="10,10,10,10" VerticalAlignment="Top" Width="100" Height="50"/>
+        </Grid>
+    </ContentControl>
 </Window>
