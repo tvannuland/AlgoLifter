@@ -18,6 +18,23 @@ namespace AlgoLifter
             return base.CreateLogger();
         }
 
+        protected override IModuleCatalog CreateModuleCatalog()
+        {
+            ModuleCatalog catalog = new ModuleCatalog();
+            catalog.AddModule(new ModuleInfo()
+            {
+                ModuleName = typeof(Modules.RS485Port.RS485PortModule).Name,
+                ModuleType = typeof(Modules.RS485Port.RS485PortModule).AssemblyQualifiedName
+            });
+            catalog.AddModule(new ModuleInfo()
+            {
+                ModuleName = typeof(Modules.DisplayCommander.DisplayCommanderModule).Name,
+                ModuleType = typeof(Modules.DisplayCommander.DisplayCommanderModule).AssemblyQualifiedName
+            });
+
+            return catalog;
+        }
+
         protected override void ConfigureModuleCatalog()
         {
             base.ConfigureModuleCatalog();

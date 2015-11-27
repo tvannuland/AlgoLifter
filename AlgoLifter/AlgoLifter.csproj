@@ -90,8 +90,16 @@
     </Compile>
     <Compile Include="Infrastructure\IPortCommunicator.cs" />
     <Compile Include="Infrastructure\TMCLReturnStatus.cs" />
-    <Compile Include="Views\MainWindow.xaml.cs">
-      <DependentUpon>MainWindow.xaml</DependentUpon>
+    <Compile Include="Modules\DisplayCommander\DisplayCommanderModule.cs" />
+    <Compile Include="Modules\DisplayCommander\ViewModels\WholeControlViewModel.cs" />
+    <Compile Include="Modules\DisplayCommander\Views\WholeControlView.xaml.cs">
+      <DependentUpon>WholeControlView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\RS485Port\RS485PortModule.cs" />
+    <Compile Include="Modules\RS485Port\Services\RS485Communicator.cs" />
+    <Compile Include="ViewModels\MainWindowViewModel.cs" />
+    <Compile Include="Views\MainWindowView.xaml.cs">
+      <DependentUpon>MainWindowView.xaml</DependentUpon>
     </Compile>
   </ItemGroup>
   <ItemGroup>
@@ -124,12 +132,14 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Modules\RS485Port\" />
     <Folder Include="Modules\TMCLCommands\" />
-    <Folder Include="ViewModels\" />
   </ItemGroup>
   <ItemGroup>
-    <Page Include="Views\MainWindow.xaml">
+    <Page Include="Modules\DisplayCommander\Views\WholeControlView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\MainWindowView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
