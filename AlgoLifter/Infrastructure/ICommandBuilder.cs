@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace AlgoLifter.Infrastructure
 {
-    public interface CommandBuilder
+    public interface ICommandBuilder
     {
         byte[] StopMotion();
         byte[] RotateLeft(int speed);
