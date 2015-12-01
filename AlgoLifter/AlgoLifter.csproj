@@ -92,6 +92,7 @@
     <Compile Include="Infrastructure\IPortCommunicator.cs" />
     <Compile Include="Infrastructure\TMCLReturnStatus.cs" />
     <Compile Include="Modules\DisplayCommander\DisplayCommanderModule.cs" />
+    <Compile Include="Modules\DisplayCommander\Models\StepperStatus.cs" />
     <Compile Include="Modules\DisplayCommander\ViewModels\WholeControlViewModel.cs" />
     <Compile Include="Modules\DisplayCommander\Views\WholeControlView.xaml.cs">
       <DependentUpon>WholeControlView.xaml</DependentUpon>
@@ -99,6 +100,8 @@
     <Compile Include="Modules\RS485Port\RS485PortModule.cs" />
     <Compile Include="Modules\RS485Port\Services\RS485Communicator.cs" />
     <Compile Include="Infrastructure\SerialDataReceivedEvent.cs" />
+    <Compile Include="Modules\TMCLCommands\Services\TMCLCommandBuilder.cs" />
+    <Compile Include="Modules\TMCLCommands\TMCLCommandModule.cs" />
     <Compile Include="ViewModels\MainWindowViewModel.cs" />
     <Compile Include="Views\MainWindowView.xaml.cs">
       <DependentUpon>MainWindowView.xaml</DependentUpon>
@@ -133,9 +136,7 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Modules\TMCLCommands\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <Page Include="Modules\DisplayCommander\Views\WholeControlView.xaml">
       <SubType>Designer</SubType>

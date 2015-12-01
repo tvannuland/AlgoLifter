@@ -35,12 +35,21 @@ namespace AlgoLifter.Modules.RS485Port.Services
 
         public bool isOpen()
         {
-            throw new NotImplementedException();
+            return comPortIsOpen;
         }
 
         public byte[] recievedData()
         {
-            throw new NotImplementedException();
+            if (!comPortIsOpen)
+                return null;
+
+            byte[] buffer = new byte[serialPort.BytesToRead];
+
+            for (int i = 0; i < serialPort.BytesToRead; i++)
+            {
+                buffer[i] = (byte) serialPort.ReadChar();
+            }
+            return buffer;
         }
 
         public void sendData(byte[] data)
@@ -79,7 +88,7 @@ namespace AlgoLifter.Modules.RS485Port.Services
         {
             SerialPort senderPort = (SerialPort) sender;
             if (senderPort == null) throw new ArgumentNullException("senderPort");
-            if (senderPort.BytesToRead > 7)
+            if (senderPort.BytesToRead > 8)
                 ea.GetEvent<Infrastructure.SerialDataReceivedEvent>().Publish(true);
         }
     }
