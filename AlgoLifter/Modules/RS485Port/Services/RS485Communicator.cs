@@ -53,7 +53,7 @@ namespace AlgoLifter.Modules.RS485Port.Services
         }
 
         public void sendData(byte[] data)
-        {
+        { //TODO: Refactor to read Status and result of sent command. Handling of answered Requests should be made possible!
             try
             {
                 serialPort.Write(data, 0, data.Length);
