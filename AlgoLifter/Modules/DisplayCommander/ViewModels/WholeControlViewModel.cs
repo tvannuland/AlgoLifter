@@ -9,6 +9,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using Prism.Commands;
+using Prism.Events;
+using AlgoLifter.Infrastructure;
 
 namespace AlgoLifter.Modules.DisplayCommander.ViewModels
 {
@@ -20,22 +22,31 @@ namespace AlgoLifter.Modules.DisplayCommander.ViewModels
         public ICommand ConnectToPortCommand { get; private set; }
         public ICommand DisconnectPortCommand { get; private set; }
 
-        private Infrastructure.IPortCommunicator comport;
-        private Infrastructure.ICommandBuilder commandBuilder;
+        private readonly IPortCommunicator comport;
+        private readonly ICommandBuilder commandBuilder;
+        private IEventAggregator eventaggregator;
 
         public WholeControlViewModel()
         {
-            comport = ServiceLocator.Current.GetInstance<Infrastructure.IPortCommunicator>();
-            commandBuilder = ServiceLocator.Current.GetInstance<Infrastructure.ICommandBuilder>();
-            ConnectToPortCommand = new DelegateCommand(ConnectToPort,() => !comport.isOpen());
+            comport = ServiceLocator.Current.GetInstance<IPortCommunicator>();
+            commandBuilder = ServiceLocator.Current.GetInstance<ICommandBuilder>();
+            eventaggregator = ServiceLocator.Current.GetInstance<IEventAggregator>();
+            this.ConnectToPortCommand = new DelegateCommand(ConnectToPort, () => !comport.isOpen());
             DisconnectPortCommand = new DelegateCommand(DisconnectPort, () => comport.isOpen());
             availablePorts = new ObservableCollection<string>(comport.getComPorts());
             selectedPort = availablePorts.FirstOrDefault();
+            eventaggregator.GetEvent<SerialDataReceivedEvent>().Subscribe(OnDataReceive);
+        }
+
+        private void OnDataReceive(bool obj)
+        {
+            TMCLReturnStatus status = commandBuilder.GetReturnStatus(comport.recievedData());
         }
 
         private void DisconnectPort()
         {
-            throw new NotImplementedException();
+            if (comport.isOpen())
+                comport.closeComPort();
         }
 
         private void ConnectToPort()
