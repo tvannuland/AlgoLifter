@@ -58,7 +58,7 @@ namespace AlgoLifter.Modules.RS485Port.Services
             {
                 serialPort.Write(data, 0, data.Length);
             }
-            finally
+            catch
             {
                 serialPort.Close();
                 comPortIsOpen = false;
@@ -78,7 +78,7 @@ namespace AlgoLifter.Modules.RS485Port.Services
                 comPortIsOpen = true;
                 serialPort.DataReceived += onDataRecieved;
             }
-            finally {
+            catch {
                 serialPort.Close();
                 comPortIsOpen = false;
             }

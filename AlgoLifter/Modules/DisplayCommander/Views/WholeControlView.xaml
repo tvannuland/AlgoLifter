@@ -1,11 +1,15 @@
-﻿<UserControl x:Class="AlgoLifter.Modules.DisplayCommander.Views.WholeControlView"
+﻿<UserControl
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:prism="http://prismlibrary.com/"
              xmlns:local="clr-namespace:AlgoLifter.Modules.DisplayCommander.Views"
+             xmlns:ViewModels="clr-namespace:AlgoLifter.Modules.DisplayCommander.ViewModels" x:Class="AlgoLifter.Modules.DisplayCommander.Views.WholeControlView"
              mc:Ignorable="d" >
+    <UserControl.DataContext>
+        <ViewModels:WholeControlViewModel/>
+    </UserControl.DataContext>
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="120"/>
@@ -25,17 +29,17 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
         <Border BorderBrush="Black" BorderThickness="1" HorizontalAlignment="Left" Height="400" Margin="10,10,10,10" VerticalAlignment="Top" Width="220" Grid.RowSpan="3" Grid.ColumnSpan="2">
-            <ListView x:Name="listView">
+            <ListView x:Name="listView" ItemsSource="{Binding Stepper_statuses}">
                 <ListView.View>
                     <GridView>
-                        <GridViewColumn Width="80" Header="ID"/>
-                        <GridViewColumn Width="140" Header="Status"/>
+                        <GridViewColumn Width="80" Header="ID" DisplayMemberBinding="{Binding id}"/>
+                        <GridViewColumn Width="140" Header="Status" DisplayMemberBinding="{Binding Status}"/>
                     </GridView>
                 </ListView.View>
             </ListView>
         </Border>
-        <Button x:Name="btnConnect" Content="Connect" HorizontalAlignment="Left" Height="50" Margin="10,10,10,10" VerticalAlignment="Top" Width="100" Grid.Column="3" />
-        <Button x:Name="btnDisconnect" Content="Disconnect" HorizontalAlignment="Left" Height="50" Margin="10,10,10,10" VerticalAlignment="Bottom" Width="100" Grid.Column="3" />
+        <Button x:Name="btnConnect" Content="Connect" HorizontalAlignment="Left" Height="50" Margin="10,10,10,10" VerticalAlignment="Top" Width="100" Grid.Column="3" Command="{Binding ConnectToPortCommand}" />
+        <Button x:Name="btnDisconnect" Content="Disconnect" HorizontalAlignment="Left" Height="50" Margin="10,10,10,10" VerticalAlignment="Bottom" Width="100" Grid.Column="3" Command="{Binding DisconnectPortCommand}"/>
         <ComboBox x:Name="cmbPort" Grid.Column="2" HorizontalAlignment="Left" Margin="10,10,10,10" VerticalAlignment="Top" Width="100" Height="50" ItemsSource="{Binding availablePorts}" IsReadOnly="True" SelectedIndex="0" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" />
     </Grid>
 </UserControl>

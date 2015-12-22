@@ -23,8 +23,13 @@ namespace AlgoLifter
             ModuleCatalog catalog = new ModuleCatalog();
             catalog.AddModule(new ModuleInfo()
             {
-                ModuleName = typeof(Modules.RS485Port.RS485PortModule).Name,
-                ModuleType = typeof(Modules.RS485Port.RS485PortModule).AssemblyQualifiedName
+                ModuleName = typeof (Modules.RS485Port.RS485PortModule).Name,
+                ModuleType = typeof (Modules.RS485Port.RS485PortModule).AssemblyQualifiedName
+            });
+            catalog.AddModule(new ModuleInfo()
+            {
+                ModuleName = typeof (Modules.TMCLCommands.TMCLCommandModule).Name,
+                ModuleType = typeof (Modules.TMCLCommands.TMCLCommandModule).AssemblyQualifiedName
             });
             catalog.AddModule(new ModuleInfo()
             {
