@@ -30,7 +30,7 @@ namespace AlgoLifter.Modules.DisplayCommander.ViewModels
             availablePorts = new ObservableCollection<string>(comport.getComPorts());
             selectedPort = availablePorts.FirstOrDefault();
             Stepper_statuses = new ObservableCollection<Models.StepperStatus>();
-            eventaggregator.GetEvent<SerialDataReceivedEvent>().Subscribe(OnDataReceive);
+            //eventaggregator.GetEvent<SerialDataReceivedEvent>().Subscribe(OnDataReceive);
         }
 
         private void OnDataReceive(bool obj)
@@ -44,15 +44,27 @@ namespace AlgoLifter.Modules.DisplayCommander.ViewModels
                 comport.closeComPort();
             DisconnectPortCommand.RaiseCanExecuteChanged();
             ConnectToPortCommand.RaiseCanExecuteChanged();
+            Stepper_statuses.Clear();
         }
 
         private void ConnectToPort()
         {
             if (selectedPort == null) return;
             comport.setComPort(selectedPort);
-            Stepper_statuses.Add(new Models.StepperStatus(){ id = 0, Status = comport.isOpen() ? "yes" : "no"});
             DisconnectPortCommand.RaiseCanExecuteChanged();
             ConnectToPortCommand.RaiseCanExecuteChanged();
+            for (var i = 0; i < 10; i++)
+            {
+                var command = commandBuilder.GetFirmwareID(i);
+                var returnmessage = comport.sendData(command);
+                if (returnmessage != null)
+                    Stepper_statuses.Add(new Models.StepperStatus()
+                    {
+                        id = i,
+                        Version = commandBuilder.ReadFirmwareID(returnmessage),
+                        Status = commandBuilder.ReadFirmwareID(returnmessage)
+                    });
+            }
         }
     }
 }

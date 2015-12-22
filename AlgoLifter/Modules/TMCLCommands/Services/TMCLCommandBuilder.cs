@@ -194,7 +194,8 @@ namespace AlgoLifter.Modules.TMCLCommands.Services
 
         public string ReadFirmwareID(byte[] message)
         {
-            return BitConverter.ToString(message, 1);
+            return Encoding.ASCII.GetString(message, 1, 8);
+            //return BitConverter.ToString((char[])message, 1);
         }
 
         public TMCLReturnStatus GetReturnStatus(byte[] reply)

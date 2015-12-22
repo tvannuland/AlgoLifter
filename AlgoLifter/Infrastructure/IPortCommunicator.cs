@@ -7,7 +7,7 @@ namespace AlgoLifter.Infrastructure
         void setComPort(string name);
         bool isOpen();
         byte[] recievedData();
-        void sendData(byte[] data);
+        byte[] sendData(byte[] data);
         List<string> getComPorts();
         void closeComPort();
     }

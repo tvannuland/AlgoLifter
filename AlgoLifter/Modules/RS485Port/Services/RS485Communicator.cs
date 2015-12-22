@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.IO.Ports;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace AlgoLifter.Modules.RS485Port.Services
@@ -15,6 +16,7 @@ namespace AlgoLifter.Modules.RS485Port.Services
         bool comPortIsOpen = false;
         string comPortName;
         SerialPort serialPort;
+        private static bool datagramAvailable = false;
 
         public RS485Communicator()
         {
@@ -49,27 +51,41 @@ namespace AlgoLifter.Modules.RS485Port.Services
             {
                 buffer[i] = (byte) serialPort.ReadChar();
             }
+
+            datagramAvailable = false;
             return buffer;
         }
 
-        public void sendData(byte[] data)
-        { //TODO: Refactor to read Status and result of sent command. Handling of answered Requests should be made possible!
+        public byte[] sendData(byte[] data)
+        {
+            if (serialPort == null)
+                return null;
             try
             {
                 serialPort.Write(data, 0, data.Length);
+                int i = 0;
+                while (!datagramAvailable)
+                {
+                    Thread.Sleep(10);
+                    if (i++ > 300)
+                        return null;
+                }
+
+                return recievedData();
             }
             catch
             {
                 serialPort.Close();
                 comPortIsOpen = false;
             }
+            return null;
         }
 
         public void setComPort(string name)
         {
             try {
-                serialPort.WriteTimeout = 100;
-                serialPort.ReadTimeout = 100;
+                serialPort.WriteTimeout = 300;
+                serialPort.ReadTimeout = 300;
                 serialPort.PortName = name;
                 serialPort.BaudRate = 9600;
                 if (serialPort.IsOpen)
@@ -89,7 +105,10 @@ namespace AlgoLifter.Modules.RS485Port.Services
             SerialPort senderPort = (SerialPort) sender;
             if (senderPort == null) throw new ArgumentNullException("senderPort");
             if (senderPort.BytesToRead > 8)
+            {
+                datagramAvailable = true;
                 ea.GetEvent<Infrastructure.SerialDataReceivedEvent>().Publish(true);
+            }
         }
     }
 }
