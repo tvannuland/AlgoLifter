@@ -32,8 +32,9 @@
             <ListView x:Name="listView" ItemsSource="{Binding Stepper_statuses}">
                 <ListView.View>
                     <GridView>
-                        <GridViewColumn Width="80" Header="ID" DisplayMemberBinding="{Binding id}"/>
-                        <GridViewColumn Width="140" Header="Status" DisplayMemberBinding="{Binding Status}"/>
+                        <GridViewColumn Width="30" Header="ID" DisplayMemberBinding="{Binding id}"/>
+                        <GridViewColumn Width="100" Header="Version" DisplayMemberBinding="{Binding Version}"/>
+                        <GridViewColumn Width="90" Header="Status" DisplayMemberBinding="{Binding Status}"/>
                     </GridView>
                 </ListView.View>
             </ListView>
@@ -41,5 +42,8 @@
         <Button x:Name="btnConnect" Content="Connect" HorizontalAlignment="Left" Height="50" Margin="10,10,10,10" VerticalAlignment="Top" Width="100" Grid.Column="3" Command="{Binding ConnectToPortCommand}" />
         <Button x:Name="btnDisconnect" Content="Disconnect" HorizontalAlignment="Left" Height="50" Margin="10,10,10,10" VerticalAlignment="Bottom" Width="100" Grid.Column="3" Command="{Binding DisconnectPortCommand}"/>
         <ComboBox x:Name="cmbPort" Grid.Column="2" HorizontalAlignment="Left" Margin="10,10,10,10" VerticalAlignment="Top" Width="100" Height="50" ItemsSource="{Binding availablePorts}" IsReadOnly="True" SelectedIndex="0" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" />
+        <Button x:Name="btnUp" Content="Up" HorizontalAlignment="Left" Height="50" Margin="10" VerticalAlignment="Top" Width="100" Grid.Column="2" Grid.Row="1" Command="{Binding GoUpCommand}" />
+        <Button x:Name="btnDown" Content="Down" HorizontalAlignment="Left" Height="50" Margin="10" VerticalAlignment="Bottom" Width="100" Grid.Column="2" Grid.Row="1" Command="{Binding GoDownCommand}" />
+        <Button x:Name="btnStop" Content="STOP" HorizontalAlignment="Left" Height="50" Margin="10" VerticalAlignment="Bottom" Width="100" Grid.Column="3" Grid.Row="1" Command="{Binding MotionStopCommand}" />
     </Grid>
 </UserControl>

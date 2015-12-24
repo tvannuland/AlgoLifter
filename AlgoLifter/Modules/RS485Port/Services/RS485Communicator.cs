@@ -44,13 +44,16 @@ namespace AlgoLifter.Modules.RS485Port.Services
         {
             if (!comPortIsOpen)
                 return null;
+            if (serialPort.BytesToRead < 9)
+                throw new ArgumentOutOfRangeException("BytesToRead Datagram Size not 9");
 
             byte[] buffer = new byte[serialPort.BytesToRead];
 
-            for (int i = 0; i < serialPort.BytesToRead; i++)
-            {
-                buffer[i] = (byte) serialPort.ReadChar();
-            }
+            serialPort.Read(buffer, 0, 9);
+            //for (int i = 0; i < serialPort.BytesToRead; i++)
+            //{
+            //    buffer[i] = (byte) serialPort.ReadChar();
+            //}
 
             datagramAvailable = false;
             return buffer;
@@ -67,7 +70,7 @@ namespace AlgoLifter.Modules.RS485Port.Services
                 while (!datagramAvailable)
                 {
                     Thread.Sleep(10);
-                    if (i++ > 300)
+                    if (i++ > 20)
                         return null;
                 }
 
@@ -88,6 +91,7 @@ namespace AlgoLifter.Modules.RS485Port.Services
                 serialPort.ReadTimeout = 300;
                 serialPort.PortName = name;
                 serialPort.BaudRate = 9600;
+                serialPort.ReceivedBytesThreshold = 9;
                 if (serialPort.IsOpen)
                     serialPort.Close();
                 serialPort.Open();

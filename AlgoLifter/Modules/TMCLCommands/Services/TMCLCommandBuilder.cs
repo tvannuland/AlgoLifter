@@ -41,7 +41,7 @@ namespace AlgoLifter.Modules.TMCLCommands.Services
         void appendChecksum(byte[] message)
         {
             var sum = 0;
-            for (var i = 0; i < message.Length-2; i++)
+            for (var i = 0; i < message.Length-1; i++)
             {
                 sum += message[i];
             }

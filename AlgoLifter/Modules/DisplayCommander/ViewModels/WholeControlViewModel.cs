@@ -5,6 +5,7 @@ using System.Linq;
 using Prism.Commands;
 using Prism.Events;
 using AlgoLifter.Infrastructure;
+using System;
 
 namespace AlgoLifter.Modules.DisplayCommander.ViewModels
 {
@@ -15,6 +16,9 @@ namespace AlgoLifter.Modules.DisplayCommander.ViewModels
         public string selectedPort { get; }
         public DelegateCommand ConnectToPortCommand { get; }
         public DelegateCommand DisconnectPortCommand { get; }
+        public DelegateCommand GoUpCommand { get; }
+        public DelegateCommand GoDownCommand { get; }
+        public DelegateCommand MotionStopCommand { get; }
 
         private readonly IPortCommunicator comport;
         private readonly ICommandBuilder commandBuilder;
@@ -25,11 +29,16 @@ namespace AlgoLifter.Modules.DisplayCommander.ViewModels
             comport = ServiceLocator.Current.GetInstance<IPortCommunicator>();
             commandBuilder = ServiceLocator.Current.GetInstance<ICommandBuilder>();
             eventaggregator = ServiceLocator.Current.GetInstance<IEventAggregator>();
+            Stepper_statuses = new ObservableCollection<Models.StepperStatus>();
+            availablePorts = new ObservableCollection<string>(comport.getComPorts());
+
             ConnectToPortCommand = new DelegateCommand(ConnectToPort, () => !comport.isOpen());
             DisconnectPortCommand = new DelegateCommand(DisconnectPort, () => comport.isOpen());
-            availablePorts = new ObservableCollection<string>(comport.getComPorts());
+            GoUpCommand = new DelegateCommand(GoUp, () => (Stepper_statuses.Count > 0));
+            GoDownCommand = new DelegateCommand(GoDown, () => (Stepper_statuses.Count > 0));
+            MotionStopCommand = new DelegateCommand(StopMotion, () => (Stepper_statuses.Count > 0));
+
             selectedPort = availablePorts.FirstOrDefault();
-            Stepper_statuses = new ObservableCollection<Models.StepperStatus>();
             //eventaggregator.GetEvent<SerialDataReceivedEvent>().Subscribe(OnDataReceive);
         }
 
@@ -45,6 +54,9 @@ namespace AlgoLifter.Modules.DisplayCommander.ViewModels
             DisconnectPortCommand.RaiseCanExecuteChanged();
             ConnectToPortCommand.RaiseCanExecuteChanged();
             Stepper_statuses.Clear();
+            GoUpCommand.RaiseCanExecuteChanged();
+            GoDownCommand.RaiseCanExecuteChanged();
+            MotionStopCommand.RaiseCanExecuteChanged();
         }
 
         private void ConnectToPort()
@@ -61,9 +73,69 @@ namespace AlgoLifter.Modules.DisplayCommander.ViewModels
                     Stepper_statuses.Add(new Models.StepperStatus()
                     {
                         id = i,
-                        Version = commandBuilder.ReadFirmwareID(returnmessage),
-                        Status = commandBuilder.ReadFirmwareID(returnmessage)
+                        Version = commandBuilder.ReadFirmwareID(returnmessage)
                     });
+            }
+            GoUpCommand.RaiseCanExecuteChanged();
+            GoDownCommand.RaiseCanExecuteChanged();
+            MotionStopCommand.RaiseCanExecuteChanged();
+        }
+
+        private void GoUp()
+        {
+            if (Stepper_statuses.Count <= 0) return;
+            foreach (var stepper in Stepper_statuses)
+            {
+                var command = commandBuilder.RotateLeft(stepper.id, 1000);
+                var answer = comport.sendData(command);
+                stepper.Status = interpretAnswer(commandBuilder.GetReturnStatus(answer));
+            }
+        }
+
+        private void GoDown()
+        {
+            if (Stepper_statuses.Count <= 0) return;
+            foreach (var stepper in Stepper_statuses)
+            {
+                var command = commandBuilder.RotateRight(stepper.id, 1000);
+                var answer = comport.sendData(command);
+                stepper.Status = interpretAnswer(commandBuilder.GetReturnStatus(answer));
+            }
+        }
+
+        private void StopMotion()
+        {
+            if (Stepper_statuses.Count <= 0) return;
+            foreach (var stepper in Stepper_statuses)
+            {
+                var command = commandBuilder.StopMotion(stepper.id);
+                var answer = comport.sendData(command);
+                stepper.Status = interpretAnswer(commandBuilder.GetReturnStatus(answer));
+            }
+        }
+
+        private string interpretAnswer(TMCLReturnStatus answer)
+        {
+            switch (answer)
+            {
+                case TMCLReturnStatus.WrongChecksum:
+                    return "bad Checksum";
+                case TMCLReturnStatus.InvalidCommand:
+                    return "invalid Command";
+                case TMCLReturnStatus.WrongType:
+                    return "Type?";
+                case TMCLReturnStatus.InvalidValue:
+                    return "bad Value";
+                case TMCLReturnStatus.EEPROMlocked:
+                    return "locked";
+                case TMCLReturnStatus.CommandNotAvailable:
+                    return "Command n/a";
+                case TMCLReturnStatus.Success:
+                    return "OK";
+                case TMCLReturnStatus.LoadedToEEPROM:
+                    return "loaded";
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(answer), answer, null);
             }
         }
     }
