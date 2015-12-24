@@ -45,5 +45,6 @@
         <Button x:Name="btnUp" Content="Up" HorizontalAlignment="Left" Height="50" Margin="10" VerticalAlignment="Top" Width="100" Grid.Column="2" Grid.Row="1" Command="{Binding GoUpCommand}" />
         <Button x:Name="btnDown" Content="Down" HorizontalAlignment="Left" Height="50" Margin="10" VerticalAlignment="Bottom" Width="100" Grid.Column="2" Grid.Row="1" Command="{Binding GoDownCommand}" />
         <Button x:Name="btnStop" Content="STOP" HorizontalAlignment="Left" Height="50" Margin="10" VerticalAlignment="Bottom" Width="100" Grid.Column="3" Grid.Row="1" Command="{Binding MotionStopCommand}" />
+        <Button x:Name="btnMoveZero" Content="move to 0" HorizontalAlignment="Left" Height="50" Margin="10" VerticalAlignment="Top" Width="100" Grid.Column="3" Grid.Row="1" Command="{Binding MoveToZeroCommand}" />
     </Grid>
 </UserControl>

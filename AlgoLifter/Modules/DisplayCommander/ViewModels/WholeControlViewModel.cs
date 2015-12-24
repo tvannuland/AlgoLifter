@@ -19,6 +19,7 @@ namespace AlgoLifter.Modules.DisplayCommander.ViewModels
         public DelegateCommand GoUpCommand { get; }
         public DelegateCommand GoDownCommand { get; }
         public DelegateCommand MotionStopCommand { get; }
+        public DelegateCommand MoveToZeroCommand { get; }
 
         private readonly IPortCommunicator comport;
         private readonly ICommandBuilder commandBuilder;
@@ -37,6 +38,7 @@ namespace AlgoLifter.Modules.DisplayCommander.ViewModels
             GoUpCommand = new DelegateCommand(GoUp, () => (Stepper_statuses.Count > 0));
             GoDownCommand = new DelegateCommand(GoDown, () => (Stepper_statuses.Count > 0));
             MotionStopCommand = new DelegateCommand(StopMotion, () => (Stepper_statuses.Count > 0));
+            MoveToZeroCommand = new DelegateCommand(MoveToZero, () => (Stepper_statuses.Count > 0));
 
             selectedPort = availablePorts.FirstOrDefault();
             //eventaggregator.GetEvent<SerialDataReceivedEvent>().Subscribe(OnDataReceive);
@@ -57,6 +59,7 @@ namespace AlgoLifter.Modules.DisplayCommander.ViewModels
             GoUpCommand.RaiseCanExecuteChanged();
             GoDownCommand.RaiseCanExecuteChanged();
             MotionStopCommand.RaiseCanExecuteChanged();
+            MoveToZeroCommand.RaiseCanExecuteChanged();
         }
 
         private void ConnectToPort()
@@ -79,6 +82,7 @@ namespace AlgoLifter.Modules.DisplayCommander.ViewModels
             GoUpCommand.RaiseCanExecuteChanged();
             GoDownCommand.RaiseCanExecuteChanged();
             MotionStopCommand.RaiseCanExecuteChanged();
+            MoveToZeroCommand.RaiseCanExecuteChanged();
         }
 
         private void GoUp()
@@ -97,7 +101,7 @@ namespace AlgoLifter.Modules.DisplayCommander.ViewModels
             if (Stepper_statuses.Count <= 0) return;
             foreach (var stepper in Stepper_statuses)
             {
-                var command = commandBuilder.RotateRight(stepper.id, 1000);
+                var command = commandBuilder.RotateRight(stepper.id, 2000);
                 var answer = comport.sendData(command);
                 stepper.Status = interpretAnswer(commandBuilder.GetReturnStatus(answer));
             }
@@ -109,6 +113,17 @@ namespace AlgoLifter.Modules.DisplayCommander.ViewModels
             foreach (var stepper in Stepper_statuses)
             {
                 var command = commandBuilder.StopMotion(stepper.id);
+                var answer = comport.sendData(command);
+                stepper.Status = interpretAnswer(commandBuilder.GetReturnStatus(answer));
+            }
+        }
+
+        private void MoveToZero()
+        {
+            if (Stepper_statuses.Count <= 0) return;
+            foreach (var stepper in Stepper_statuses)
+            {
+                var command = commandBuilder.MoveToPosition(stepper.id, 0);
                 var answer = comport.sendData(command);
                 stepper.Status = interpretAnswer(commandBuilder.GetReturnStatus(answer));
             }
