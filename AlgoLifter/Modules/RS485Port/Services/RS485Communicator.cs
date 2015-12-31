@@ -70,7 +70,7 @@ namespace AlgoLifter.Modules.RS485Port.Services
                 while (!datagramAvailable)
                 {
                     Thread.Sleep(10);
-                    if (i++ > 20)
+                    if (i++ > 15)
                         return null;
                 }
 

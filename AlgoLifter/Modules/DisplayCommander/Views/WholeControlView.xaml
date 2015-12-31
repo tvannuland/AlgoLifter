@@ -5,6 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:prism="http://prismlibrary.com/"
              xmlns:local="clr-namespace:AlgoLifter.Modules.DisplayCommander.Views"
+             xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
              xmlns:ViewModels="clr-namespace:AlgoLifter.Modules.DisplayCommander.ViewModels" x:Class="AlgoLifter.Modules.DisplayCommander.Views.WholeControlView"
              mc:Ignorable="d" >
     <UserControl.DataContext>
@@ -34,17 +35,69 @@
                     <GridView>
                         <GridViewColumn Width="30" Header="ID" DisplayMemberBinding="{Binding id}"/>
                         <GridViewColumn Width="100" Header="Version" DisplayMemberBinding="{Binding Version}"/>
-                        <GridViewColumn Width="90" Header="Status" DisplayMemberBinding="{Binding Status}"/>
+                        <GridViewColumn Width="80" Header="Status" DisplayMemberBinding="{Binding Status}"/>
                     </GridView>
                 </ListView.View>
             </ListView>
         </Border>
         <Button x:Name="btnConnect" Content="Connect" HorizontalAlignment="Left" Height="50" Margin="10,10,10,10" VerticalAlignment="Top" Width="100" Grid.Column="3" Command="{Binding ConnectToPortCommand}" />
         <Button x:Name="btnDisconnect" Content="Disconnect" HorizontalAlignment="Left" Height="50" Margin="10,10,10,10" VerticalAlignment="Bottom" Width="100" Grid.Column="3" Command="{Binding DisconnectPortCommand}"/>
-        <ComboBox x:Name="cmbPort" Grid.Column="2" HorizontalAlignment="Left" Margin="10,10,10,10" VerticalAlignment="Top" Width="100" Height="50" ItemsSource="{Binding availablePorts}" IsReadOnly="True" SelectedIndex="0" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" />
+        <ComboBox x:Name="cmbPort" Grid.Column="2" HorizontalAlignment="Left" Margin="10,10,10,10" VerticalAlignment="Top" Width="100" Height="50" ItemsSource="{Binding availablePorts}" IsReadOnly="True" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" SelectedItem="{Binding selectedPort}">
+            <ComboBox.ItemTemplate>
+                <DataTemplate>
+                    <TextBlock Text="{Binding}" HorizontalAlignment="Center" VerticalAlignment="Center" /> <!--TODO: Ausrichtung des Inhalts anpassen-->
+                </DataTemplate>
+            </ComboBox.ItemTemplate>
+        </ComboBox>
+        <Label Content="Microsteps: " Grid.Column="4" Grid.Row="0" HorizontalAlignment="Left" VerticalAlignment="Top" Width="100" Height="50" FontSize="14" Margin="10" VerticalContentAlignment="Center"/>
         <Button x:Name="btnUp" Content="Up" HorizontalAlignment="Left" Height="50" Margin="10" VerticalAlignment="Top" Width="100" Grid.Column="2" Grid.Row="1" Command="{Binding GoUpCommand}" />
         <Button x:Name="btnDown" Content="Down" HorizontalAlignment="Left" Height="50" Margin="10" VerticalAlignment="Bottom" Width="100" Grid.Column="2" Grid.Row="1" Command="{Binding GoDownCommand}" />
         <Button x:Name="btnStop" Content="STOP" HorizontalAlignment="Left" Height="50" Margin="10" VerticalAlignment="Bottom" Width="100" Grid.Column="3" Grid.Row="1" Command="{Binding MotionStopCommand}" />
         <Button x:Name="btnMoveZero" Content="move to 0" HorizontalAlignment="Left" Height="50" Margin="10" VerticalAlignment="Top" Width="100" Grid.Column="3" Grid.Row="1" Command="{Binding MoveToZeroCommand}" />
+        <Label Content="Position:" Grid.Column="2" Grid.Row="0" Height="25" Width="100" Margin="10,80,10,10" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="14" VerticalContentAlignment="Center" />
+        <Label Content="{Binding Position}" Grid.Column="2" Grid.Row="0" Height="25" Width="100" Margin="10" HorizontalAlignment="Right" VerticalAlignment="Bottom" FontSize="14" VerticalContentAlignment="Center" />
+        <Label Content="Pulse Divider: " Grid.Column="4" Grid.Row="0" HorizontalAlignment="Left" VerticalAlignment="Bottom" Width="100" Height="50" FontSize="14" Margin="10" VerticalContentAlignment="Center" />
+        <Label Content="Ramp Divider: " Grid.Column="4" Grid.Row="1" HorizontalAlignment="Left" VerticalAlignment="Top" Width="100" Height="50" FontSize="14" Margin="10" VerticalContentAlignment="Center" />
+        <Label Content="Velocity: " Grid.Column="4" Grid.Row="1" HorizontalAlignment="Left" VerticalAlignment="Bottom" Width="100" Height="50" FontSize="14" Margin="10" VerticalContentAlignment="Center" />
+        <Label Content="Acceleration: " Grid.Column="4" Grid.Row="2" HorizontalAlignment="Left" VerticalAlignment="Top" Width="100" Height="50" FontSize="14" Margin="10" VerticalContentAlignment="Center" />
+        <ComboBox x:Name="cmbMicroSteps" Grid.Column="5" HorizontalAlignment="Left" Margin="10" VerticalAlignment="Top" Width="100" Height="50" ItemsSource="{Binding Microsteps}" IsReadOnly="True" SelectedItem="{Binding SelectedMicrosteps}" VerticalContentAlignment="Center" HorizontalContentAlignment="Center">
+            <ComboBox.ItemTemplate>
+                <DataTemplate>
+                    <TextBlock Text="{Binding}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                    <!--TODO: Ausrichtung des Inhalts anpassen-->
+                </DataTemplate>
+            </ComboBox.ItemTemplate>
+            <i:Interaction.Triggers>
+                <i:EventTrigger EventName="SelectionChanged">
+                    <i:InvokeCommandAction Command="{Binding MicrostepSelectionChange}" />
+                </i:EventTrigger>
+            </i:Interaction.Triggers>
+        </ComboBox>
+        <ComboBox x:Name="cmbRampDivider" Grid.Column="5" HorizontalAlignment="Left" Margin="10" VerticalAlignment="Top" Width="100" Height="50" ItemsSource="{Binding Divider}" IsReadOnly="True" SelectedItem="{Binding RampDivider}" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" Grid.Row="1">
+            <ComboBox.ItemTemplate>
+                <DataTemplate>
+                    <TextBlock Text="{Binding}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                </DataTemplate>
+            </ComboBox.ItemTemplate>
+            <i:Interaction.Triggers>
+                <i:EventTrigger EventName="SelectionChanged">
+                    <i:InvokeCommandAction Command="{Binding RampDividerChange}" />
+                </i:EventTrigger>
+            </i:Interaction.Triggers>
+        </ComboBox>
+        <ComboBox x:Name="cmbPulseDivider" Grid.Column="5" HorizontalAlignment="Left" Margin="10" VerticalAlignment="Bottom" Width="100" Height="50" ItemsSource="{Binding Divider}" IsReadOnly="True" SelectedItem="{Binding PulseDivider}" VerticalContentAlignment="Center" HorizontalContentAlignment="Center">
+            <ComboBox.ItemTemplate>
+                <DataTemplate>
+                    <TextBlock Text="{Binding}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                </DataTemplate>
+            </ComboBox.ItemTemplate>
+            <i:Interaction.Triggers>
+                <i:EventTrigger EventName="SelectionChanged">
+                    <i:InvokeCommandAction Command="{Binding PulseDividerChange}" />
+                </i:EventTrigger>
+            </i:Interaction.Triggers>
+        </ComboBox>
+        <TextBox Text="{Binding Speed}" Grid.Column="5" Grid.Row="1" Width="100" Height="50" Margin="10" VerticalAlignment="Bottom" HorizontalContentAlignment="Left" VerticalContentAlignment="Center" FontSize="14" />
+        <TextBox Text="{Binding Acceleration}" Grid.Column="5" Grid.Row="2" Width="100" Height="50" Margin="10" VerticalAlignment="Top" HorizontalContentAlignment="Left" VerticalContentAlignment="Center" FontSize="14"/>
     </Grid>
 </UserControl>

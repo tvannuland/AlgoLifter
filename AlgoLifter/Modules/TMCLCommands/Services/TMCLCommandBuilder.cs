@@ -166,11 +166,56 @@ namespace AlgoLifter.Modules.TMCLCommands.Services
             return message;
         }
 
+        public byte[] GetSpeed(int id)
+        {
+            var message = getDatagramForId(id);
+            message[1] = 6;
+            message[2] = 4;
+            appendChecksum(message);
+            return message;
+        }
+
+        public byte[] GetAcceleration(int id)
+        {
+            var message = getDatagramForId(id);
+            message[1] = 6;
+            message[2] = 5;
+            appendChecksum(message);
+            return message;
+        }
+
+        public byte[] GetSpeedDivider(int id)
+        {
+            var message = getDatagramForId(id);
+            message[1] = 6;
+            message[2] = 154;
+            appendChecksum(message);
+            return message;
+        }
+
+        public byte[] GetRampDivider(int id)
+        {
+            var message = getDatagramForId(id);
+            message[1] = 6;
+            message[2] = 153;
+            appendChecksum(message);
+            return message;
+        }
+
         public byte[] GetActualPosition(int id)
         {
             var message = getDatagramForId(id);
             message[1] = 6;
             message[2] = 1;
+            appendChecksum(message);
+            return message;
+        }
+
+        public byte[] GetMicrostepResolution(int id)
+        {
+            var message = getDatagramForId(id);
+            message[1] = 6;
+            message[2] = 140;
             appendChecksum(message);
             return message;
         }
@@ -184,9 +229,17 @@ namespace AlgoLifter.Modules.TMCLCommands.Services
             return message;
         }
 
+        public int ReadValue(byte[] message)
+        {
+            var sub = message.ToList().GetRange(4, 4).ToArray();
+            if (BitConverter.IsLittleEndian)
+                Array.Reverse(sub);
+            return BitConverter.ToInt32(sub, 0);
+        }
+
         public int ReadActualPosition(byte[] message)
         {
-            var sub = message.ToList().GetRange(1, 8).ToArray();
+            var sub = message.ToList().GetRange(4, 4).ToArray();
             if (BitConverter.IsLittleEndian)
                 Array.Reverse(sub);
             return BitConverter.ToInt32(sub, 0);

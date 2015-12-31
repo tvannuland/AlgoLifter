@@ -1,36 +1,86 @@
-﻿using Microsoft.Practices.ServiceLocation;
-using Prism.Mvvm;
+﻿using System;
 using System.Collections.ObjectModel;
 using System.Linq;
+using AlgoLifter.Infrastructure;
+using AlgoLifter.Modules.DisplayCommander.Models;
+using Microsoft.Practices.ServiceLocation;
 using Prism.Commands;
 using Prism.Events;
-using AlgoLifter.Infrastructure;
-using System;
+using Prism.Mvvm;
 
 namespace AlgoLifter.Modules.DisplayCommander.ViewModels
 {
     public class WholeControlViewModel : BindableBase
     {
         public ObservableCollection<string> availablePorts { get; set; }
-        public ObservableCollection<Models.StepperStatus> Stepper_statuses { get; set; }
-        public string selectedPort { get; }
+        public ObservableCollection<StepperStatus> Stepper_statuses { get; set; }
+        public string selectedPort { get; set; }
         public DelegateCommand ConnectToPortCommand { get; }
         public DelegateCommand DisconnectPortCommand { get; }
         public DelegateCommand GoUpCommand { get; }
         public DelegateCommand GoDownCommand { get; }
         public DelegateCommand MotionStopCommand { get; }
         public DelegateCommand MoveToZeroCommand { get; }
+        public DelegateCommand MicrostepSelectionChange { get; }
+        public DelegateCommand RampDividerChange { get; }
+        public DelegateCommand PulseDividerChange { get; }
+
+        public int[] Divider { get; set; } = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13 };
+        public int[] Microsteps { get; set; } = { 1, 2, 4, 8, 16, 32, 64, 128, 256 };
+
+        public int PulseDivider { get; set; } = 0;
+        public int RampDivider { get; set; } = 0;
+        public int SelectedMicrosteps { get; set; } = 256;
+        public int Position { get; set; }
+
+        public int Acceleration
+        {
+            get { return acceleration; }
+            set
+            {
+                if (value < 0) value = 0;
+                if (value > 2047) value = 2047;
+                if (Stepper_statuses.Count > 0) {
+                    foreach (var stepper in Stepper_statuses) {
+                        var command = commandBuilder.SetAcceleration(stepper.id, value);
+                        var answer = comport.sendData(command);
+                        stepper.Status = interpretAnswer(commandBuilder.GetReturnStatus(answer));
+                    }
+                }
+                SetProperty(ref acceleration, value);
+            }
+        }
+
+        public int Speed
+        {
+            get { return speed; }
+            set
+            {
+                if (value < 0) value = 0;
+                if (value > 2047) value = 2047;
+                if (Stepper_statuses.Count > 0) {
+                    foreach (var stepper in Stepper_statuses) {
+                        var command = commandBuilder.SetSpeed(stepper.id, value);
+                        var answer = comport.sendData(command);
+                        stepper.Status = interpretAnswer(commandBuilder.GetReturnStatus(answer));
+                    }
+                }
+                SetProperty(ref speed, value);
+            }
+        }
 
         private readonly IPortCommunicator comport;
         private readonly ICommandBuilder commandBuilder;
         private readonly IEventAggregator eventaggregator;
+        private int acceleration = 0; 
+        private int speed = 0;
 
         public WholeControlViewModel()
         {
             comport = ServiceLocator.Current.GetInstance<IPortCommunicator>();
             commandBuilder = ServiceLocator.Current.GetInstance<ICommandBuilder>();
             eventaggregator = ServiceLocator.Current.GetInstance<IEventAggregator>();
-            Stepper_statuses = new ObservableCollection<Models.StepperStatus>();
+            Stepper_statuses = new ObservableCollection<StepperStatus>();
             availablePorts = new ObservableCollection<string>(comport.getComPorts());
 
             ConnectToPortCommand = new DelegateCommand(ConnectToPort, () => !comport.isOpen());
@@ -39,9 +89,50 @@ namespace AlgoLifter.Modules.DisplayCommander.ViewModels
             GoDownCommand = new DelegateCommand(GoDown, () => (Stepper_statuses.Count > 0));
             MotionStopCommand = new DelegateCommand(StopMotion, () => (Stepper_statuses.Count > 0));
             MoveToZeroCommand = new DelegateCommand(MoveToZero, () => (Stepper_statuses.Count > 0));
+            MicrostepSelectionChange = new DelegateCommand(onMicrostepSelectionChange);
+            RampDividerChange = new DelegateCommand(onRampDividerChange);
+            PulseDividerChange = new DelegateCommand(onPulseDividerChange);
 
             selectedPort = availablePorts.FirstOrDefault();
             //eventaggregator.GetEvent<SerialDataReceivedEvent>().Subscribe(OnDataReceive);
+        }
+
+        private void onPulseDividerChange()
+        {
+            if (Stepper_statuses.Count > 0) {
+                foreach (var stepper in Stepper_statuses) {
+                    var command = commandBuilder.SetSpeedDivider(stepper.id, PulseDivider);
+                    var answer = comport.sendData(command);
+                    stepper.Status = interpretAnswer(commandBuilder.GetReturnStatus(answer));
+                }
+            }
+        }
+
+        private void onRampDividerChange()
+        {
+            if (Stepper_statuses.Count > 0) {
+                foreach (var stepper in Stepper_statuses) {
+                    var command = commandBuilder.SetRampDivider(stepper.id, RampDivider);
+                    var answer = comport.sendData(command);
+                    stepper.Status = interpretAnswer(commandBuilder.GetReturnStatus(answer));
+                }
+            }
+        }
+
+        private void onMicrostepSelectionChange()
+        {
+            Position = (int) Math.Round((Math.Log10(SelectedMicrosteps)/Math.Log10(2)));
+            OnPropertyChanged("Position");
+            if (Stepper_statuses.Count > 0)
+            {
+                foreach (var stepper in Stepper_statuses)
+                {
+                    var command = commandBuilder.SetMicrostepResolution(stepper.id, (int) Math.Round(
+                        (Math.Log10(SelectedMicrosteps)/Math.Log10(2))));
+                    var answer = comport.sendData(command);
+                    stepper.Status = interpretAnswer(commandBuilder.GetReturnStatus(answer));
+                }
+            }
         }
 
         private void OnDataReceive(bool obj)
@@ -73,16 +164,47 @@ namespace AlgoLifter.Modules.DisplayCommander.ViewModels
                 var command = commandBuilder.GetFirmwareID(i);
                 var returnmessage = comport.sendData(command);
                 if (returnmessage != null)
-                    Stepper_statuses.Add(new Models.StepperStatus()
+                    Stepper_statuses.Add(new StepperStatus
                     {
                         id = i,
                         Version = commandBuilder.ReadFirmwareID(returnmessage)
                     });
             }
-            GoUpCommand.RaiseCanExecuteChanged();
-            GoDownCommand.RaiseCanExecuteChanged();
-            MotionStopCommand.RaiseCanExecuteChanged();
-            MoveToZeroCommand.RaiseCanExecuteChanged();
+
+            if (Stepper_statuses.Count > 0)
+            {
+                var stepper = Stepper_statuses.FirstOrDefault();
+                var command = commandBuilder.GetMicrostepResolution(stepper.id);
+                var answer = comport.sendData(command);
+                stepper.Status = interpretAnswer(commandBuilder.GetReturnStatus(answer));
+                SelectedMicrosteps = (int) Math.Pow(2, commandBuilder.ReadValue(answer));
+                OnPropertyChanged("SelectedMicrosteps");
+                command = commandBuilder.GetRampDivider(stepper.id);
+                answer = comport.sendData(command);
+                stepper.Status = interpretAnswer(commandBuilder.GetReturnStatus(answer));
+                RampDivider = commandBuilder.ReadValue(answer);
+                OnPropertyChanged("RampDivider");
+                command = commandBuilder.GetSpeedDivider(stepper.id);
+                answer = comport.sendData(command);
+                stepper.Status = interpretAnswer(commandBuilder.GetReturnStatus(answer));
+                PulseDivider = commandBuilder.ReadValue(answer);
+                OnPropertyChanged("PulseDivider");
+                command = commandBuilder.GetSpeed(stepper.id);
+                answer = comport.sendData(command);
+                stepper.Status = interpretAnswer(commandBuilder.GetReturnStatus(answer));
+                Speed = commandBuilder.ReadValue(answer);
+                OnPropertyChanged("Speed");
+                command = commandBuilder.GetAcceleration(stepper.id);
+                answer = comport.sendData(command);
+                stepper.Status = interpretAnswer(commandBuilder.GetReturnStatus(answer));
+                Acceleration = commandBuilder.ReadValue(answer);
+                OnPropertyChanged("Acceleration");
+
+                GoUpCommand.RaiseCanExecuteChanged();
+                GoDownCommand.RaiseCanExecuteChanged();
+                MotionStopCommand.RaiseCanExecuteChanged();
+                MoveToZeroCommand.RaiseCanExecuteChanged();
+            }
         }
 
         private void GoUp()
@@ -90,7 +212,7 @@ namespace AlgoLifter.Modules.DisplayCommander.ViewModels
             if (Stepper_statuses.Count <= 0) return;
             foreach (var stepper in Stepper_statuses)
             {
-                var command = commandBuilder.RotateLeft(stepper.id, 1000);
+                var command = commandBuilder.RotateLeft(stepper.id, Speed);
                 var answer = comport.sendData(command);
                 stepper.Status = interpretAnswer(commandBuilder.GetReturnStatus(answer));
             }
@@ -101,7 +223,7 @@ namespace AlgoLifter.Modules.DisplayCommander.ViewModels
             if (Stepper_statuses.Count <= 0) return;
             foreach (var stepper in Stepper_statuses)
             {
-                var command = commandBuilder.RotateRight(stepper.id, 2000);
+                var command = commandBuilder.RotateRight(stepper.id, Speed);
                 var answer = comport.sendData(command);
                 stepper.Status = interpretAnswer(commandBuilder.GetReturnStatus(answer));
             }
