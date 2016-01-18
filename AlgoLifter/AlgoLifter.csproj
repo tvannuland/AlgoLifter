@@ -92,6 +92,7 @@
     <Compile Include="Infrastructure\IPortCommunicator.cs" />
     <Compile Include="Infrastructure\TMCLReturnStatus.cs" />
     <Compile Include="Modules\DisplayCommander\DisplayCommanderModule.cs" />
+    <Compile Include="Modules\DisplayCommander\Models\Position.cs" />
     <Compile Include="Modules\DisplayCommander\Models\StepperStatus.cs" />
     <Compile Include="Modules\DisplayCommander\ViewModels\WholeControlViewModel.cs" />
     <Compile Include="Modules\DisplayCommander\Views\WholeControlView.xaml.cs">

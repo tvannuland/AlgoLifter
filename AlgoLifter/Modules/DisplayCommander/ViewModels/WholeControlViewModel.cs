@@ -14,6 +14,7 @@ namespace AlgoLifter.Modules.DisplayCommander.ViewModels
     {
         public ObservableCollection<string> availablePorts { get; set; }
         public ObservableCollection<StepperStatus> Stepper_statuses { get; set; }
+        public ObservableCollection<Position> Positions { get; set; }
         public string selectedPort { get; set; }
         public DelegateCommand ConnectToPortCommand { get; }
         public DelegateCommand DisconnectPortCommand { get; }
@@ -24,6 +25,7 @@ namespace AlgoLifter.Modules.DisplayCommander.ViewModels
         public DelegateCommand MicrostepSelectionChange { get; }
         public DelegateCommand RampDividerChange { get; }
         public DelegateCommand PulseDividerChange { get; }
+        public DelegateCommand AddPositionCommand { get; }
 
         public int[] Divider { get; set; } = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13 };
         public int[] Microsteps { get; set; } = { 1, 2, 4, 8, 16, 32, 64, 128, 256 };
@@ -92,6 +94,8 @@ namespace AlgoLifter.Modules.DisplayCommander.ViewModels
             MicrostepSelectionChange = new DelegateCommand(onMicrostepSelectionChange);
             RampDividerChange = new DelegateCommand(onRampDividerChange);
             PulseDividerChange = new DelegateCommand(onPulseDividerChange);
+            AddPositionCommand = new DelegateCommand(AddPosition);
+            Positions = new ObservableCollection<Position>();
 
             selectedPort = availablePorts.FirstOrDefault();
             //eventaggregator.GetEvent<SerialDataReceivedEvent>().Subscribe(OnDataReceive);
@@ -248,6 +252,30 @@ namespace AlgoLifter.Modules.DisplayCommander.ViewModels
                 var command = commandBuilder.MoveToPosition(stepper.id, 0);
                 var answer = comport.sendData(command);
                 stepper.Status = interpretAnswer(commandBuilder.GetReturnStatus(answer));
+            }
+        }
+
+        private void AddPosition()
+        {
+            if (Stepper_statuses.Count <= 0)
+            {
+                var position = new Position
+                {
+                    Microsteps = 0,
+                    Distance = 0
+                };
+                Positions.Add(position);
+            } else
+            {
+                var command = commandBuilder.GetActualPosition(Stepper_statuses.FirstOrDefault().id);
+                var answer = comport.sendData(command);
+                Stepper_statuses.FirstOrDefault().Status = interpretAnswer(commandBuilder.GetReturnStatus(answer));
+                var position = new Position
+                {
+                    Microsteps = commandBuilder.ReadValue(answer)
+                };
+                position.Distance = (double) position.Microsteps/(SelectedMicrosteps*200);
+                Positions.Add(position);
             }
         }
 

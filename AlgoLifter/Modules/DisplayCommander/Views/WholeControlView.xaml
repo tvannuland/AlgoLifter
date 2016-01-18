@@ -29,7 +29,7 @@
             <RowDefinition Height="140"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-        <Border BorderBrush="Black" BorderThickness="1" HorizontalAlignment="Left" Height="400" Margin="10,10,10,10" VerticalAlignment="Top" Width="220" Grid.RowSpan="3" Grid.ColumnSpan="2">
+        <Border BorderBrush="Black" BorderThickness="1" HorizontalAlignment="Left" Height="260" Margin="10,10,10,10" VerticalAlignment="Top" Width="220" Grid.RowSpan="2" Grid.ColumnSpan="2">
             <ListView x:Name="listView" ItemsSource="{Binding Stepper_statuses}">
                 <ListView.View>
                     <GridView>
@@ -40,8 +40,21 @@
                 </ListView.View>
             </ListView>
         </Border>
-        <Button x:Name="btnConnect" Content="Connect" HorizontalAlignment="Left" Height="50" Margin="10,10,10,10" VerticalAlignment="Top" Width="100" Grid.Column="3" Command="{Binding ConnectToPortCommand}" />
-        <Button x:Name="btnDisconnect" Content="Disconnect" HorizontalAlignment="Left" Height="50" Margin="10,10,10,10" VerticalAlignment="Bottom" Width="100" Grid.Column="3" Command="{Binding DisconnectPortCommand}"/>
+        <ListView x:Name="listOfStops" Margin="10" Grid.Column="0" Grid.ColumnSpan="6" Grid.Row="3" Grid.RowSpan="2" ItemsSource="{Binding Positions}">
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <StackPanel Orientation="Horizontal">
+                        <Button x:Name="btnRemove" Content="X" Width="50" Command="{Binding RemoveFromCollectionCommand}" />
+                        <Button x:Name="btnMoveTo" Content="Move To" Command="{Binding GoToPositionCommand}" />
+                        <TextBox x:Name="txtPosition" Height="50" Margin="5" HorizontalAlignment="Stretch" HorizontalContentAlignment="Right" VerticalContentAlignment="Center" FontSize="14" Text="{Binding Distance}" />
+                        <Label x:Name="lblPosition" Content="{Binding Microsteps}" />
+                    </StackPanel>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
+        <Button x:Name="btnAddStop" Content="Add" HorizontalAlignment="Left" Margin="10" VerticalAlignment="Bottom" Grid.Column="0" Grid.Row="2" Command="{Binding AddPositionCommand}"/>
+        <Button x:Name="btnConnect" Content="Connect" HorizontalAlignment="Left" Margin="10,10,10,10" VerticalAlignment="Top" Grid.Column="3" Command="{Binding ConnectToPortCommand}" />
+        <Button x:Name="btnDisconnect" Content="Disconnect" HorizontalAlignment="Left" Margin="10,10,10,10" VerticalAlignment="Bottom" Grid.Column="3" Command="{Binding DisconnectPortCommand}"/>
         <ComboBox x:Name="cmbPort" Grid.Column="2" HorizontalAlignment="Left" Margin="10,10,10,10" VerticalAlignment="Top" Width="100" Height="50" ItemsSource="{Binding availablePorts}" IsReadOnly="True" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" SelectedItem="{Binding selectedPort}">
             <ComboBox.ItemTemplate>
                 <DataTemplate>
