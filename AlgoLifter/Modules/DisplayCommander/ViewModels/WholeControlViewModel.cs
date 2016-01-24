@@ -95,9 +95,12 @@ namespace AlgoLifter.Modules.DisplayCommander.ViewModels
             RampDividerChange = new DelegateCommand(onRampDividerChange);
             PulseDividerChange = new DelegateCommand(onPulseDividerChange);
             AddPositionCommand = new DelegateCommand(AddPosition);
-            Positions = new ObservableCollection<Position>();
+            Positions = new ObservableCollection<Models.Position>();
 
             selectedPort = availablePorts.FirstOrDefault();
+            eventaggregator.GetEvent<MoveToPositionEvent>().Subscribe(MoveToPosition, ThreadOption.UIThread);
+            eventaggregator.GetEvent<RemovePositionFromListEvent>()
+                .Subscribe(RemovePositionFromList, ThreadOption.UIThread);
             //eventaggregator.GetEvent<SerialDataReceivedEvent>().Subscribe(OnDataReceive);
         }
 
@@ -246,10 +249,14 @@ namespace AlgoLifter.Modules.DisplayCommander.ViewModels
 
         private void MoveToZero()
         {
+            MoveToPosition(0);
+        }
+
+        private void MoveToPosition(int position)
+        {
             if (Stepper_statuses.Count <= 0) return;
-            foreach (var stepper in Stepper_statuses)
-            {
-                var command = commandBuilder.MoveToPosition(stepper.id, 0);
+            foreach (var stepper in Stepper_statuses) {
+                var command = commandBuilder.MoveToPosition(stepper.id, position);
                 var answer = comport.sendData(command);
                 stepper.Status = interpretAnswer(commandBuilder.GetReturnStatus(answer));
             }
@@ -276,6 +283,14 @@ namespace AlgoLifter.Modules.DisplayCommander.ViewModels
                 };
                 position.Distance = (double) position.Microsteps/(SelectedMicrosteps*200);
                 Positions.Add(position);
+            }
+        }
+
+        private void RemovePositionFromList(Position thePositionWereTalkingAbout)
+        {
+            if ((Positions.Count > 0) && (Positions.Contains(thePositionWereTalkingAbout)))
+            {
+                Positions.Remove(thePositionWereTalkingAbout);
             }
         }
 

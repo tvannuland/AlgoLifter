@@ -90,6 +90,8 @@
     </Compile>
     <Compile Include="Infrastructure\ICommandBuilder.cs" />
     <Compile Include="Infrastructure\IPortCommunicator.cs" />
+    <Compile Include="Infrastructure\MoveToPositionEvent.cs" />
+    <Compile Include="Infrastructure\RemovePositionFromListEvent.cs" />
     <Compile Include="Infrastructure\TMCLReturnStatus.cs" />
     <Compile Include="Modules\DisplayCommander\DisplayCommanderModule.cs" />
     <Compile Include="Modules\DisplayCommander\Models\Position.cs" />
@@ -140,6 +142,10 @@
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
+    <Page Include="Infrastructure\Styles.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Modules\DisplayCommander\Views\WholeControlView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

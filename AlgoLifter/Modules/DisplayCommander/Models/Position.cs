@@ -2,7 +2,10 @@
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using AlgoLifter.Annotations;
+using Microsoft.Practices.ServiceLocation;
 using Prism.Commands;
+using Prism.Events;
+using AlgoLifter.Infrastructure;
 
 namespace AlgoLifter.Modules.DisplayCommander.Models
 {
@@ -10,6 +13,7 @@ namespace AlgoLifter.Modules.DisplayCommander.Models
     {
         private int microsteps;
         private double distance;
+        private int microstepResolution;
         public event PropertyChangedEventHandler PropertyChanged;
 
         public double Distance
@@ -37,20 +41,38 @@ namespace AlgoLifter.Modules.DisplayCommander.Models
             }
         }
 
+        public int MicrostepResolution
+        {
+            get
+            {
+                return microstepResolution;
+            }
+
+            set
+            {
+                if (value == microstepResolution) return;
+                microstepResolution = value;
+                On_property_changed();
+            }
+        }
+
+        private EventAggregator ea;
+
         public Position()
         {
             RemoveFromCollectionCommand = new DelegateCommand(RemoveFromCollection);
             GoToPositionCommand = new DelegateCommand(GoToPosition);
+            ea = ServiceLocator.Current.GetInstance<EventAggregator>();
         }
 
         private void GoToPosition()
         {
-            throw new NotImplementedException();
+            ea.GetEvent<MoveToPositionEvent>().Publish(microsteps);
         }
 
         private void RemoveFromCollection()
         {
-            throw new NotImplementedException();
+            ea.GetEvent<RemovePositionFromListEvent>().Publish(this);
         }
 
         [NotifyPropertyChangedInvocator]

@@ -11,69 +11,85 @@
     <UserControl.DataContext>
         <ViewModels:WholeControlViewModel/>
     </UserControl.DataContext>
-    <Grid>
+    <UserControl.Resources>
+        <ResourceDictionary Source="pack://application:,,,/Infrastructure/Styles.xaml"></ResourceDictionary>
+    </UserControl.Resources>
+    <Grid Background="DarkGray">
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="120"/>
-            <ColumnDefinition Width="120"/>
-            <ColumnDefinition Width="120"/>
-            <ColumnDefinition Width="120"/>
-            <ColumnDefinition Width="120"/>
-            <ColumnDefinition Width="120"/>
-            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="110"/>
+            <ColumnDefinition Width="110"/>
+            <ColumnDefinition Width="110"/>
+            <ColumnDefinition Width="110"/>
+            <ColumnDefinition Width="110"/>
+            <ColumnDefinition Width="110"/>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
-            <RowDefinition Height="140"/>
-            <RowDefinition Height="140"/>
-            <RowDefinition Height="140"/>
-            <RowDefinition Height="140"/>
-            <RowDefinition Height="140"/>
-            <RowDefinition Height="*"/>
+            <RowDefinition Height="60"/>
+            <RowDefinition Height="60"/>
+            <RowDefinition Height="60"/>
+            <RowDefinition Height="60"/>
+            <RowDefinition Height="60"/>
+            <RowDefinition Height="60"/>
+            <RowDefinition Height="60"/>
+            <RowDefinition Height="60"/>
+            <RowDefinition Height="60"/>
+            <RowDefinition Height="60"/>
+            <RowDefinition Height="60"/>
         </Grid.RowDefinitions>
-        <Border BorderBrush="Black" BorderThickness="1" HorizontalAlignment="Left" Height="260" Margin="10,10,10,10" VerticalAlignment="Top" Width="220" Grid.RowSpan="2" Grid.ColumnSpan="2">
-            <ListView x:Name="listView" ItemsSource="{Binding Stepper_statuses}">
-                <ListView.View>
-                    <GridView>
-                        <GridViewColumn Width="30" Header="ID" DisplayMemberBinding="{Binding id}"/>
-                        <GridViewColumn Width="100" Header="Version" DisplayMemberBinding="{Binding Version}"/>
-                        <GridViewColumn Width="80" Header="Status" DisplayMemberBinding="{Binding Status}"/>
-                    </GridView>
-                </ListView.View>
-            </ListView>
-        </Border>
-        <ListView x:Name="listOfStops" Margin="10" Grid.Column="0" Grid.ColumnSpan="6" Grid.Row="3" Grid.RowSpan="2" ItemsSource="{Binding Positions}">
+        <ListView x:Name="listView" Grid.RowSpan="4" Grid.ColumnSpan="2" Margin="5" ItemsSource="{Binding Stepper_statuses}">
+            <ListView.View>
+                <GridView>
+                    <GridViewColumn Width="20" Header="ID" DisplayMemberBinding="{Binding id}"/>
+                    <GridViewColumn Width="100" Header="Version" DisplayMemberBinding="{Binding Version}"/>
+                    <GridViewColumn Width="90" Header="Status" DisplayMemberBinding="{Binding Status}"/>
+                </GridView>
+            </ListView.View>
+        </ListView>
+        <ListView x:Name="listOfStops" Margin="5" Grid.Column="0" Grid.ColumnSpan="6" Grid.Row="7" Grid.RowSpan="4" ItemsSource="{Binding Positions}">
+            <ListView.ItemContainerStyle>
+                <Style TargetType="ListViewItem">
+                    <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                </Style>
+            </ListView.ItemContainerStyle>
             <ListView.ItemTemplate>
                 <DataTemplate>
-                    <StackPanel Orientation="Horizontal">
-                        <Button x:Name="btnRemove" Content="X" Width="50" Command="{Binding RemoveFromCollectionCommand}" />
-                        <Button x:Name="btnMoveTo" Content="Move To" Command="{Binding GoToPositionCommand}" />
-                        <TextBox x:Name="txtPosition" Height="50" Margin="5" HorizontalAlignment="Stretch" HorizontalContentAlignment="Right" VerticalContentAlignment="Center" FontSize="14" Text="{Binding Distance}" />
-                        <Label x:Name="lblPosition" Content="{Binding Microsteps}" />
-                    </StackPanel>
+                    <Grid HorizontalAlignment="Stretch">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <Button x:Name="btnRemove" Grid.Column="0" Content="X" Width="50" MinWidth="50" Command="{Binding RemoveFromCollectionCommand}" />
+                        <Button x:Name="btnMoveTo" Grid.Column="1" Content="Move To" Padding="0,5,5,0" MinWidth="2" Command="{Binding GoToPositionCommand}" />
+                        <TextBox x:Name="txtPosition" Grid.Column="2" Height="50" Margin="5" HorizontalAlignment="Stretch" HorizontalContentAlignment="Right" VerticalContentAlignment="Center" FontSize="14" Text="{Binding Distance}" />
+                        <Label x:Name="lblPosition" Grid.Column="3" Width="100" HorizontalContentAlignment="Right" Content="{Binding Microsteps}" />
+                    </Grid>
                 </DataTemplate>
             </ListView.ItemTemplate>
         </ListView>
-        <Button x:Name="btnAddStop" Content="Add" HorizontalAlignment="Left" Margin="10" VerticalAlignment="Bottom" Grid.Column="0" Grid.Row="2" Command="{Binding AddPositionCommand}"/>
-        <Button x:Name="btnConnect" Content="Connect" HorizontalAlignment="Left" Margin="10,10,10,10" VerticalAlignment="Top" Grid.Column="3" Command="{Binding ConnectToPortCommand}" />
-        <Button x:Name="btnDisconnect" Content="Disconnect" HorizontalAlignment="Left" Margin="10,10,10,10" VerticalAlignment="Bottom" Grid.Column="3" Command="{Binding DisconnectPortCommand}"/>
-        <ComboBox x:Name="cmbPort" Grid.Column="2" HorizontalAlignment="Left" Margin="10,10,10,10" VerticalAlignment="Top" Width="100" Height="50" ItemsSource="{Binding availablePorts}" IsReadOnly="True" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" SelectedItem="{Binding selectedPort}">
+        <Button x:Name="btnAddStop" Content="Add" Grid.Column="0" Grid.Row="6" Command="{Binding AddPositionCommand}"/>
+        <Button x:Name="btnConnect" Content="Connect" Grid.Column="3" Grid.Row="0" Command="{Binding ConnectToPortCommand}" />
+        <Button x:Name="btnDisconnect" Content="Disconnect" Grid.Column="3" Grid.Row="1" Command="{Binding DisconnectPortCommand}"/>
+        <ComboBox x:Name="cmbPort" Grid.Column="2" Grid.Row="0" Margin="5" Width="100" Height="50" ItemsSource="{Binding availablePorts}" IsReadOnly="True" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" SelectedItem="{Binding selectedPort}">
             <ComboBox.ItemTemplate>
                 <DataTemplate>
                     <TextBlock Text="{Binding}" HorizontalAlignment="Center" VerticalAlignment="Center" /> <!--TODO: Ausrichtung des Inhalts anpassen-->
                 </DataTemplate>
             </ComboBox.ItemTemplate>
         </ComboBox>
-        <Label Content="Microsteps: " Grid.Column="4" Grid.Row="0" HorizontalAlignment="Left" VerticalAlignment="Top" Width="100" Height="50" FontSize="14" Margin="10" VerticalContentAlignment="Center"/>
-        <Button x:Name="btnUp" Content="Up" HorizontalAlignment="Left" Height="50" Margin="10" VerticalAlignment="Top" Width="100" Grid.Column="2" Grid.Row="1" Command="{Binding GoUpCommand}" />
-        <Button x:Name="btnDown" Content="Down" HorizontalAlignment="Left" Height="50" Margin="10" VerticalAlignment="Bottom" Width="100" Grid.Column="2" Grid.Row="1" Command="{Binding GoDownCommand}" />
-        <Button x:Name="btnStop" Content="STOP" HorizontalAlignment="Left" Height="50" Margin="10" VerticalAlignment="Bottom" Width="100" Grid.Column="3" Grid.Row="1" Command="{Binding MotionStopCommand}" />
-        <Button x:Name="btnMoveZero" Content="move to 0" HorizontalAlignment="Left" Height="50" Margin="10" VerticalAlignment="Top" Width="100" Grid.Column="3" Grid.Row="1" Command="{Binding MoveToZeroCommand}" />
-        <Label Content="Position:" Grid.Column="2" Grid.Row="0" Height="25" Width="100" Margin="10,80,10,10" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="14" VerticalContentAlignment="Center" />
-        <Label Content="{Binding Position}" Grid.Column="2" Grid.Row="0" Height="25" Width="100" Margin="10" HorizontalAlignment="Right" VerticalAlignment="Bottom" FontSize="14" VerticalContentAlignment="Center" />
-        <Label Content="Pulse Divider: " Grid.Column="4" Grid.Row="0" HorizontalAlignment="Left" VerticalAlignment="Bottom" Width="100" Height="50" FontSize="14" Margin="10" VerticalContentAlignment="Center" />
-        <Label Content="Ramp Divider: " Grid.Column="4" Grid.Row="1" HorizontalAlignment="Left" VerticalAlignment="Top" Width="100" Height="50" FontSize="14" Margin="10" VerticalContentAlignment="Center" />
-        <Label Content="Velocity: " Grid.Column="4" Grid.Row="1" HorizontalAlignment="Left" VerticalAlignment="Bottom" Width="100" Height="50" FontSize="14" Margin="10" VerticalContentAlignment="Center" />
-        <Label Content="Acceleration: " Grid.Column="4" Grid.Row="2" HorizontalAlignment="Left" VerticalAlignment="Top" Width="100" Height="50" FontSize="14" Margin="10" VerticalContentAlignment="Center" />
-        <ComboBox x:Name="cmbMicroSteps" Grid.Column="5" HorizontalAlignment="Left" Margin="10" VerticalAlignment="Top" Width="100" Height="50" ItemsSource="{Binding Microsteps}" IsReadOnly="True" SelectedItem="{Binding SelectedMicrosteps}" VerticalContentAlignment="Center" HorizontalContentAlignment="Center">
+        <Label Content="Microsteps: " Grid.Column="4" Grid.Row="0"/>
+        <Button x:Name="btnUp" Content="Up" Grid.Column="2" Grid.Row="2" Command="{Binding GoUpCommand}" />
+        <Button x:Name="btnDown" Content="Down" Grid.Column="2" Grid.Row="3" Command="{Binding GoDownCommand}" />
+        <Button x:Name="btnStop" Content="STOP" Grid.Column="3" Grid.Row="2" Command="{Binding MotionStopCommand}" />
+        <Button x:Name="btnMoveZero" Content="move to 0" Grid.Column="3" Grid.Row="3" Command="{Binding MoveToZeroCommand}" />
+        <Label Content="Position:" Grid.Column="2" Grid.Row="1" Height="25" Width="100" Margin="5" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="14" VerticalContentAlignment="Center" />
+        <Label Content="{Binding Position}" Grid.Column="2" Grid.Row="1" Height="25" VerticalAlignment="Bottom"/>
+        <Label Content="Pulse Divider: " Grid.Column="4" Grid.Row="1"/>
+        <Label Content="Ramp Divider: " Grid.Column="4" Grid.Row="2"/>
+        <Label Content="Velocity: " Grid.Column="4" Grid.Row="3"/>
+        <Label Content="Acceleration: " Grid.Column="4" Grid.Row="4"/>
+        <ComboBox x:Name="cmbMicroSteps" Grid.Column="5" Margin="5" ItemsSource="{Binding Microsteps}" IsReadOnly="True" SelectedItem="{Binding SelectedMicrosteps}" VerticalContentAlignment="Center" HorizontalContentAlignment="Center">
             <ComboBox.ItemTemplate>
                 <DataTemplate>
                     <TextBlock Text="{Binding}" HorizontalAlignment="Center" VerticalAlignment="Center" />
@@ -86,7 +102,7 @@
                 </i:EventTrigger>
             </i:Interaction.Triggers>
         </ComboBox>
-        <ComboBox x:Name="cmbRampDivider" Grid.Column="5" HorizontalAlignment="Left" Margin="10" VerticalAlignment="Top" Width="100" Height="50" ItemsSource="{Binding Divider}" IsReadOnly="True" SelectedItem="{Binding RampDivider}" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" Grid.Row="1">
+        <ComboBox x:Name="cmbRampDivider" Grid.Column="5" Margin="5" ItemsSource="{Binding Divider}" IsReadOnly="True" SelectedItem="{Binding RampDivider}" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" Grid.Row="2">
             <ComboBox.ItemTemplate>
                 <DataTemplate>
                     <TextBlock Text="{Binding}" HorizontalAlignment="Center" VerticalAlignment="Center" />
@@ -98,7 +114,7 @@
                 </i:EventTrigger>
             </i:Interaction.Triggers>
         </ComboBox>
-        <ComboBox x:Name="cmbPulseDivider" Grid.Column="5" HorizontalAlignment="Left" Margin="10" VerticalAlignment="Bottom" Width="100" Height="50" ItemsSource="{Binding Divider}" IsReadOnly="True" SelectedItem="{Binding PulseDivider}" VerticalContentAlignment="Center" HorizontalContentAlignment="Center">
+        <ComboBox x:Name="cmbPulseDivider" Grid.Column="5" Grid.Row="1" Margin="5" ItemsSource="{Binding Divider}" IsReadOnly="True" SelectedItem="{Binding PulseDivider}" VerticalContentAlignment="Center" HorizontalContentAlignment="Center">
             <ComboBox.ItemTemplate>
                 <DataTemplate>
                     <TextBlock Text="{Binding}" HorizontalAlignment="Center" VerticalAlignment="Center" />
@@ -110,7 +126,7 @@
                 </i:EventTrigger>
             </i:Interaction.Triggers>
         </ComboBox>
-        <TextBox Text="{Binding Speed}" Grid.Column="5" Grid.Row="1" Width="100" Height="50" Margin="10" VerticalAlignment="Bottom" HorizontalContentAlignment="Left" VerticalContentAlignment="Center" FontSize="14" />
-        <TextBox Text="{Binding Acceleration}" Grid.Column="5" Grid.Row="2" Width="100" Height="50" Margin="10" VerticalAlignment="Top" HorizontalContentAlignment="Left" VerticalContentAlignment="Center" FontSize="14"/>
+        <TextBox Text="{Binding Speed}" Grid.Column="5" Grid.Row="3" Margin="5" VerticalContentAlignment="Center" FontSize="14" />
+        <TextBox Text="{Binding Acceleration}" Grid.Column="5" Grid.Row="4" Margin="5" VerticalContentAlignment="Center" FontSize="14"/>
     </Grid>
 </UserControl>
