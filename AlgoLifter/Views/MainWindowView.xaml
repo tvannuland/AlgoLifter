@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:prism="http://prismlibrary.com/"
         xmlns:local="clr-namespace:AlgoLifter"
-        Title="AlgoLifter Control" Height="800" Width="1280">
+        Title="AlgoLifter Control" Width="680" Height="700">
     <Grid>
         <ContentControl prism:RegionManager.RegionName="MainWindow" />
     </Grid>
