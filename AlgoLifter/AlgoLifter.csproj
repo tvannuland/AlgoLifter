@@ -91,6 +91,7 @@
     <Compile Include="Infrastructure\ICommandBuilder.cs" />
     <Compile Include="Infrastructure\IPortCommunicator.cs" />
     <Compile Include="Infrastructure\MoveToPositionEvent.cs" />
+    <Compile Include="Infrastructure\NewMicrostepResolutionEvent.cs" />
     <Compile Include="Infrastructure\RemovePositionFromListEvent.cs" />
     <Compile Include="Infrastructure\TMCLReturnStatus.cs" />
     <Compile Include="Modules\DisplayCommander\DisplayCommanderModule.cs" />

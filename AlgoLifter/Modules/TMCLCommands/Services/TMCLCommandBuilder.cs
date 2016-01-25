@@ -115,6 +115,15 @@ namespace AlgoLifter.Modules.TMCLCommands.Services
             return message;
         }
 
+        public byte[] SetBaudRate(int id, int baudrate)
+        {
+            var message = getDatagramForId(id);
+            message[1] = 9;
+            message[2] = 65;
+            appendChecksum(message);
+            return message;
+        }
+
         public byte[] SetSpeedDivider(int id, int divider)
         {
             var message = getDatagramForId(id);
@@ -180,6 +189,15 @@ namespace AlgoLifter.Modules.TMCLCommands.Services
             var message = getDatagramForId(id);
             message[1] = 6;
             message[2] = 5;
+            appendChecksum(message);
+            return message;
+        }
+
+        public byte[] GetBaudRate(int id)
+        {
+            var message = getDatagramForId(id);
+            message[1] = 10;
+            message[2] = 65;
             appendChecksum(message);
             return message;
         }

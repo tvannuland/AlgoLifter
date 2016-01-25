@@ -33,7 +33,7 @@ namespace AlgoLifter.Modules.DisplayCommander.ViewModels
         public int PulseDivider { get; set; } = 0;
         public int RampDivider { get; set; } = 0;
         public int SelectedMicrosteps { get; set; } = 256;
-        public int Position { get; set; }
+        public double Position { get; set; }
 
         public int Acceleration
         {
@@ -128,15 +128,20 @@ namespace AlgoLifter.Modules.DisplayCommander.ViewModels
 
         private void onMicrostepSelectionChange()
         {
-            Position = (int) Math.Round((Math.Log10(SelectedMicrosteps)/Math.Log10(2)));
-            OnPropertyChanged("Position");
+            eventaggregator.GetEvent<NewMicrostepResolutionEvent>().Publish(SelectedMicrosteps);
+            //Position = (int) Math.Round((Math.Log10(SelectedMicrosteps)/Math.Log10(2)));
+            //OnPropertyChanged("Position");
             if (Stepper_statuses.Count > 0)
             {
+                int currentPosition = (int) Math.Round((Position/(Math.PI*1.5)*SelectedMicrosteps*200));
                 foreach (var stepper in Stepper_statuses)
                 {
                     var command = commandBuilder.SetMicrostepResolution(stepper.id, (int) Math.Round(
                         (Math.Log10(SelectedMicrosteps)/Math.Log10(2))));
                     var answer = comport.sendData(command);
+                    stepper.Status = interpretAnswer(commandBuilder.GetReturnStatus(answer));
+                    command = commandBuilder.SetActualPosition(stepper.id, currentPosition);
+                    answer = comport.sendData(command);
                     stepper.Status = interpretAnswer(commandBuilder.GetReturnStatus(answer));
                 }
             }
@@ -177,6 +182,26 @@ namespace AlgoLifter.Modules.DisplayCommander.ViewModels
                         Version = commandBuilder.ReadFirmwareID(returnmessage)
                     });
             }
+
+            /*if (Stepper_statuses.Count > 0)
+            {
+                foreach (var stepperStatus in Stepper_statuses)
+                {
+                    var command = commandBuilder.SetBaudRate(stepperStatus.id, 7);
+                    var answer = comport.sendData(command);
+                    stepperStatus.Status = interpretAnswer(commandBuilder.GetReturnStatus(answer));
+                }
+                comport.closeComPort();
+                comport.setComPort(selectedPort, 115200);
+                foreach (var stepper in Stepper_statuses)
+                {
+                    var command = commandBuilder.GetFirmwareID(stepper.id);
+                    var answer = comport.sendData(command);
+                    if (answer != null) {
+                        stepper.Version = "+" + commandBuilder.ReadFirmwareID(answer);
+                    } else return;
+                }
+            }*/
 
             if (Stepper_statuses.Count > 0)
             {
@@ -245,6 +270,9 @@ namespace AlgoLifter.Modules.DisplayCommander.ViewModels
                 var answer = comport.sendData(command);
                 stepper.Status = interpretAnswer(commandBuilder.GetReturnStatus(answer));
             }
+            var answered = comport.sendData(commandBuilder.GetActualPosition(Stepper_statuses.FirstOrDefault().id));
+            Position = ((double)commandBuilder.ReadValue(answered)/(SelectedMicrosteps*200))*Math.PI*1.5;
+            OnPropertyChanged("Position");
         }
 
         private void MoveToZero()
@@ -260,6 +288,8 @@ namespace AlgoLifter.Modules.DisplayCommander.ViewModels
                 var answer = comport.sendData(command);
                 stepper.Status = interpretAnswer(commandBuilder.GetReturnStatus(answer));
             }
+            Position = ((double) position/(SelectedMicrosteps*200))*Math.PI*1.5;
+            OnPropertyChanged("Position");
         }
 
         private void AddPosition()
@@ -269,7 +299,8 @@ namespace AlgoLifter.Modules.DisplayCommander.ViewModels
                 var position = new Position
                 {
                     Microsteps = 0,
-                    Distance = 0
+                    Revolutions = 0,
+                    MicrostepResolution = SelectedMicrosteps
                 };
                 Positions.Add(position);
             } else
@@ -281,7 +312,8 @@ namespace AlgoLifter.Modules.DisplayCommander.ViewModels
                 {
                     Microsteps = commandBuilder.ReadValue(answer)
                 };
-                position.Distance = (double) position.Microsteps/(SelectedMicrosteps*200);
+                position.Revolutions = (double) position.Microsteps/(SelectedMicrosteps*200);
+                position.MicrostepResolution = SelectedMicrosteps;
                 Positions.Add(position);
             }
         }

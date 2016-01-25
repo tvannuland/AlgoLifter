@@ -16,6 +16,7 @@ namespace AlgoLifter.Infrastructure
 
         byte[] SetSpeed(int id, int speed);
         byte[] SetAcceleration(int id, int acceleration);
+        byte[] SetBaudRate(int id, int baudrate);
         byte[] SetSpeedDivider(int id, int divider);
         byte[] SetRampDivider(int id, int divider);
         byte[] SetActualPosition(int id, int position);
@@ -24,6 +25,7 @@ namespace AlgoLifter.Infrastructure
 
         byte[] GetSpeed(int id);
         byte[] GetAcceleration(int id);
+        byte[] GetBaudRate(int id);
         byte[] GetSpeedDivider(int id);
         byte[] GetRampDivider(int id);
         byte[] GetActualPosition(int id);

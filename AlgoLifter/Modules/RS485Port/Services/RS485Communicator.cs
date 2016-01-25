@@ -86,11 +86,16 @@ namespace AlgoLifter.Modules.RS485Port.Services
 
         public void setComPort(string name)
         {
+            setComPort(name, 9600);
+        }
+
+        public void setComPort(string name, int rate)
+        {
             try {
                 serialPort.WriteTimeout = 300;
                 serialPort.ReadTimeout = 300;
                 serialPort.PortName = name;
-                serialPort.BaudRate = 9600;
+                serialPort.BaudRate = rate;
                 serialPort.ReceivedBytesThreshold = 9;
                 if (serialPort.IsOpen)
                     serialPort.Close();
