@@ -269,9 +269,33 @@ namespace AlgoLifter.Modules.TMCLCommands.Services
             //return BitConverter.ToString((char[])message, 1);
         }
 
-        public TMCLReturnStatus GetReturnStatus(byte[] reply)
+        public TMCLReturnStatus GetReturnStatusCode(byte[] reply)
         {
             return (TMCLReturnStatus) reply[2];
         }
+
+        public string GetReturnStatus(byte[] reply)
+        {
+            switch ((TMCLReturnStatus) reply[2]) {
+                case TMCLReturnStatus.WrongChecksum:
+                    return "bad Checksum";
+                case TMCLReturnStatus.InvalidCommand:
+                    return "invalid Command";
+                case TMCLReturnStatus.WrongType:
+                    return "Type?";
+                case TMCLReturnStatus.InvalidValue:
+                    return "bad Value";
+                case TMCLReturnStatus.EEPROMlocked:
+                    return "locked";
+                case TMCLReturnStatus.CommandNotAvailable:
+                    return "Command n/a";
+                case TMCLReturnStatus.Success:
+                    return "OK";
+                case TMCLReturnStatus.LoadedToEEPROM:
+                    return "loaded";
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(reply), reply, null);
+        }
+    }
     }
 }

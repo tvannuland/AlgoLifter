@@ -6,10 +6,10 @@
              xmlns:prism="http://prismlibrary.com/"
              xmlns:local="clr-namespace:AlgoLifter.Modules.DisplayCommander.Views"
              xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
-             xmlns:ViewModels="clr-namespace:AlgoLifter.Modules.DisplayCommander.ViewModels" x:Class="AlgoLifter.Modules.DisplayCommander.Views.WholeControlView"
+             xmlns:viewModels="clr-namespace:AlgoLifter.Modules.DisplayCommander.ViewModels" x:Class="AlgoLifter.Modules.DisplayCommander.Views.WholeControlView"
              mc:Ignorable="d" >
     <UserControl.DataContext>
-        <ViewModels:WholeControlViewModel/>
+        <viewModels:WholeControlViewModel/>
     </UserControl.DataContext>
     <UserControl.Resources>
         <ResourceDictionary Source="pack://application:,,,/Infrastructure/Styles.xaml"></ResourceDictionary>
@@ -36,7 +36,7 @@
             <RowDefinition Height="60"/>
             <RowDefinition Height="60"/>
         </Grid.RowDefinitions>
-        <ListView x:Name="listView" Grid.RowSpan="4" Grid.ColumnSpan="2" Margin="5" ItemsSource="{Binding Stepper_statuses}">
+        <ListView x:Name="ListView" Grid.RowSpan="4" Grid.ColumnSpan="2" Margin="5" ItemsSource="{Binding Stepper_statuses}">
             <ListView.View>
                 <GridView>
                     <GridViewColumn Width="25" Header="ID" DisplayMemberBinding="{Binding id}"/>
@@ -131,5 +131,7 @@
         </ComboBox>
         <TextBox Text="{Binding Speed}" Grid.Column="5" Grid.Row="3" Margin="5" VerticalContentAlignment="Center" FontSize="14" />
         <TextBox Text="{Binding Acceleration}" Grid.Column="5" Grid.Row="4" Margin="5" VerticalContentAlignment="Center" FontSize="14"/>
+        <Slider Grid.Column="2" Grid.ColumnSpan="3" HorizontalAlignment="Stretch" Margin="5" Grid.Row="5" VerticalAlignment="Center"/>
+        <Slider Grid.Column="2" Grid.ColumnSpan="3" HorizontalAlignment="Stretch" Margin="5" Grid.Row="6" VerticalAlignment="Center"/>
     </Grid>
 </UserControl>

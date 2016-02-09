@@ -14,7 +14,6 @@ namespace AlgoLifter.Modules.RS485Port.Services
     {
         static IEventAggregator ea;
         bool comPortIsOpen = false;
-        string comPortName;
         SerialPort serialPort;
         private static bool datagramAvailable = false;
 

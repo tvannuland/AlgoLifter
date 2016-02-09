@@ -33,6 +33,12 @@ namespace AlgoLifter.Modules.DisplayCommander.ViewModels
         public int PulseDivider { get; set; } = 0;
         public int RampDivider { get; set; } = 0;
         public int SelectedMicrosteps { get; set; } = 256;
+        public int vmin { get; set; }
+        public int vmax { get; set; }
+        public int vselected { get; set; }
+        public int amin { get; set; }
+        public int amax { get; set; }
+        public int aselected { get; set; }
         public double Position { get; set; }
 
         public int Acceleration
@@ -46,7 +52,7 @@ namespace AlgoLifter.Modules.DisplayCommander.ViewModels
                     foreach (var stepper in Stepper_statuses) {
                         var command = commandBuilder.SetAcceleration(stepper.id, value);
                         var answer = comport.sendData(command);
-                        stepper.Status = interpretAnswer(commandBuilder.GetReturnStatus(answer));
+                        stepper.Status = commandBuilder.GetReturnStatus(answer);
                     }
                 }
                 SetProperty(ref acceleration, value);
@@ -64,7 +70,7 @@ namespace AlgoLifter.Modules.DisplayCommander.ViewModels
                     foreach (var stepper in Stepper_statuses) {
                         var command = commandBuilder.SetSpeed(stepper.id, value);
                         var answer = comport.sendData(command);
-                        stepper.Status = interpretAnswer(commandBuilder.GetReturnStatus(answer));
+                        stepper.Status = commandBuilder.GetReturnStatus(answer);
                     }
                 }
                 SetProperty(ref speed, value);
@@ -110,7 +116,7 @@ namespace AlgoLifter.Modules.DisplayCommander.ViewModels
                 foreach (var stepper in Stepper_statuses) {
                     var command = commandBuilder.SetSpeedDivider(stepper.id, PulseDivider);
                     var answer = comport.sendData(command);
-                    stepper.Status = interpretAnswer(commandBuilder.GetReturnStatus(answer));
+                    stepper.Status = commandBuilder.GetReturnStatus(answer);
                 }
             }
         }
@@ -121,7 +127,7 @@ namespace AlgoLifter.Modules.DisplayCommander.ViewModels
                 foreach (var stepper in Stepper_statuses) {
                     var command = commandBuilder.SetRampDivider(stepper.id, RampDivider);
                     var answer = comport.sendData(command);
-                    stepper.Status = interpretAnswer(commandBuilder.GetReturnStatus(answer));
+                    stepper.Status = commandBuilder.GetReturnStatus(answer);
                 }
             }
         }
@@ -139,17 +145,17 @@ namespace AlgoLifter.Modules.DisplayCommander.ViewModels
                     var command = commandBuilder.SetMicrostepResolution(stepper.id, (int) Math.Round(
                         (Math.Log10(SelectedMicrosteps)/Math.Log10(2))));
                     var answer = comport.sendData(command);
-                    stepper.Status = interpretAnswer(commandBuilder.GetReturnStatus(answer));
+                    stepper.Status = commandBuilder.GetReturnStatus(answer);
                     command = commandBuilder.SetActualPosition(stepper.id, currentPosition);
                     answer = comport.sendData(command);
-                    stepper.Status = interpretAnswer(commandBuilder.GetReturnStatus(answer));
+                    stepper.Status = commandBuilder.GetReturnStatus(answer);
                 }
             }
         }
 
         private void OnDataReceive(bool obj)
         {
-            TMCLReturnStatus status = commandBuilder.GetReturnStatus(comport.recievedData());
+            string status = commandBuilder.GetReturnStatus(comport.recievedData());
         }
 
         private void DisconnectPort()
@@ -189,7 +195,7 @@ namespace AlgoLifter.Modules.DisplayCommander.ViewModels
                 {
                     var command = commandBuilder.SetBaudRate(stepperStatus.id, 7);
                     var answer = comport.sendData(command);
-                    stepperStatus.Status = interpretAnswer(commandBuilder.GetReturnStatus(answer));
+                    stepperStatus.Status = commandBuilder.GetReturnStatus(answer);
                 }
                 comport.closeComPort();
                 comport.setComPort(selectedPort, 115200);
@@ -208,27 +214,27 @@ namespace AlgoLifter.Modules.DisplayCommander.ViewModels
                 var stepper = Stepper_statuses.FirstOrDefault();
                 var command = commandBuilder.GetMicrostepResolution(stepper.id);
                 var answer = comport.sendData(command);
-                stepper.Status = interpretAnswer(commandBuilder.GetReturnStatus(answer));
+                stepper.Status = commandBuilder.GetReturnStatus(answer);
                 SelectedMicrosteps = (int) Math.Pow(2, commandBuilder.ReadValue(answer));
                 OnPropertyChanged("SelectedMicrosteps");
                 command = commandBuilder.GetRampDivider(stepper.id);
                 answer = comport.sendData(command);
-                stepper.Status = interpretAnswer(commandBuilder.GetReturnStatus(answer));
+                stepper.Status = commandBuilder.GetReturnStatus(answer);
                 RampDivider = commandBuilder.ReadValue(answer);
                 OnPropertyChanged("RampDivider");
                 command = commandBuilder.GetSpeedDivider(stepper.id);
                 answer = comport.sendData(command);
-                stepper.Status = interpretAnswer(commandBuilder.GetReturnStatus(answer));
+                stepper.Status = commandBuilder.GetReturnStatus(answer);
                 PulseDivider = commandBuilder.ReadValue(answer);
                 OnPropertyChanged("PulseDivider");
                 command = commandBuilder.GetSpeed(stepper.id);
                 answer = comport.sendData(command);
-                stepper.Status = interpretAnswer(commandBuilder.GetReturnStatus(answer));
+                stepper.Status = commandBuilder.GetReturnStatus(answer);
                 Speed = commandBuilder.ReadValue(answer);
                 OnPropertyChanged("Speed");
                 command = commandBuilder.GetAcceleration(stepper.id);
                 answer = comport.sendData(command);
-                stepper.Status = interpretAnswer(commandBuilder.GetReturnStatus(answer));
+                stepper.Status = commandBuilder.GetReturnStatus(answer);
                 Acceleration = commandBuilder.ReadValue(answer);
                 OnPropertyChanged("Acceleration");
 
@@ -246,7 +252,7 @@ namespace AlgoLifter.Modules.DisplayCommander.ViewModels
             {
                 var command = commandBuilder.RotateLeft(stepper.id, Speed);
                 var answer = comport.sendData(command);
-                stepper.Status = interpretAnswer(commandBuilder.GetReturnStatus(answer));
+                stepper.Status = commandBuilder.GetReturnStatus(answer);
             }
         }
 
@@ -257,7 +263,7 @@ namespace AlgoLifter.Modules.DisplayCommander.ViewModels
             {
                 var command = commandBuilder.RotateRight(stepper.id, Speed);
                 var answer = comport.sendData(command);
-                stepper.Status = interpretAnswer(commandBuilder.GetReturnStatus(answer));
+                stepper.Status = commandBuilder.GetReturnStatus(answer);
             }
         }
 
@@ -268,7 +274,7 @@ namespace AlgoLifter.Modules.DisplayCommander.ViewModels
             {
                 var command = commandBuilder.StopMotion(stepper.id);
                 var answer = comport.sendData(command);
-                stepper.Status = interpretAnswer(commandBuilder.GetReturnStatus(answer));
+                stepper.Status = commandBuilder.GetReturnStatus(answer);
             }
             var answered = comport.sendData(commandBuilder.GetActualPosition(Stepper_statuses.FirstOrDefault().id));
             Position = ((double)commandBuilder.ReadValue(answered)/(SelectedMicrosteps*200))*Math.PI*1.5;
@@ -286,7 +292,7 @@ namespace AlgoLifter.Modules.DisplayCommander.ViewModels
             foreach (var stepper in Stepper_statuses) {
                 var command = commandBuilder.MoveToPosition(stepper.id, position);
                 var answer = comport.sendData(command);
-                stepper.Status = interpretAnswer(commandBuilder.GetReturnStatus(answer));
+                stepper.Status = commandBuilder.GetReturnStatus(answer);
             }
             Position = ((double) position/(SelectedMicrosteps*200))*Math.PI*1.5;
             OnPropertyChanged("Position");
@@ -307,7 +313,7 @@ namespace AlgoLifter.Modules.DisplayCommander.ViewModels
             {
                 var command = commandBuilder.GetActualPosition(Stepper_statuses.FirstOrDefault().id);
                 var answer = comport.sendData(command);
-                Stepper_statuses.FirstOrDefault().Status = interpretAnswer(commandBuilder.GetReturnStatus(answer));
+                Stepper_statuses.FirstOrDefault().Status = commandBuilder.GetReturnStatus(answer);
                 var position = new Position
                 {
                     Microsteps = commandBuilder.ReadValue(answer)
@@ -326,29 +332,14 @@ namespace AlgoLifter.Modules.DisplayCommander.ViewModels
             }
         }
 
-        private string interpretAnswer(TMCLReturnStatus answer)
+        private int GetVmin()
         {
-            switch (answer)
-            {
-                case TMCLReturnStatus.WrongChecksum:
-                    return "bad Checksum";
-                case TMCLReturnStatus.InvalidCommand:
-                    return "invalid Command";
-                case TMCLReturnStatus.WrongType:
-                    return "Type?";
-                case TMCLReturnStatus.InvalidValue:
-                    return "bad Value";
-                case TMCLReturnStatus.EEPROMlocked:
-                    return "locked";
-                case TMCLReturnStatus.CommandNotAvailable:
-                    return "Command n/a";
-                case TMCLReturnStatus.Success:
-                    return "OK";
-                case TMCLReturnStatus.LoadedToEEPROM:
-                    return "loaded";
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(answer), answer, null);
-            }
+            return 1;
+        }
+
+        private int GetVmax()
+        {
+            return 2047;
         }
     }
 }

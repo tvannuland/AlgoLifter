@@ -34,6 +34,6 @@ namespace AlgoLifter.Infrastructure
 
         int ReadValue(byte[] message);
         string ReadFirmwareID(byte[] message);
-        TMCLReturnStatus GetReturnStatus(byte[] reply);
+        string GetReturnStatus(byte[] reply);
     }
 }
